@@ -2,8 +2,8 @@ package gwntools
 
 import (
 	"bufio"
-	"fmt"
 	"io"
+	"log"
 	"os"
 )
 
@@ -24,7 +24,7 @@ func NewProcess(r io.Reader, w io.Writer) *Process {
 }
 
 // Interactive interact with the process
-func (p Process) Interactive() error {
+func (p Process) Interactive() {
 	ch := make(chan error, 2)
 
 	go func() {
@@ -40,39 +40,35 @@ func (p Process) Interactive() error {
 	for i := 0; i < 2; i++ {
 		err := <-ch
 		if err != nil {
-			return fmt.Errorf("Error interacting with process: v%", err)
+			log.Fatal("Error interacting with process: v%", err)
 		}
 	}
-
-	return nil
 }
 
 // Write writes data to a process' stdin
-func (p *Process) Write(data []byte) error {
+func (p *Process) Write(data []byte) {
 	_, err := p.Writer.Write(data)
 	if err != nil {
-		return fmt.Errorf("Error writing data to process: %v", err)
+		log.Fatal("Error writing data to process: %v", err)
 	}
-
-	return nil
 }
 
 // Readline read data from process until first newline "\n"
-func (p *Process) ReadLine() ([]byte, error) {
+func (p *Process) ReadLine() []byte {
 	line, err := p.BufReader.ReadBytes('\n')
 	if err != nil {
-		return nil, fmt.Errorf("Error reading line from process: %v", err)
+		log.Fatal("Error reading line from process: %v", err)
 	}
 
-	return line, nil
+	return line
 }
 
 // ReadByte reads and returns a single byte from process
-func (p *Process) ReadByte() (byte, error) {
+func (p *Process) ReadByte() byte {
 	b, err := p.BufReader.ReadByte()
 	if err != nil {
-		return 0, fmt.Errorf("Error reading byte from process: %v", err)
+		log.Fatal("Error reading byte from process: %v", err)
 	}
 
-	return b, nil
+	return b
 }
